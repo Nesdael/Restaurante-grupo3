@@ -1,114 +1,173 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Restaurant API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+REST API for a restaurant management platform: tables, menu and reservations.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Built for the advanced Node.js + NestJS track at RIWI. Backlog: HU-001 to HU-010.
 
-## Description
+## Tech stack
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+| Layer | Technology |
+|---|---|
+| Runtime | Node.js 22 LTS |
+| Language | TypeScript (ESM) |
+| Framework | NestJS |
+| Package manager | npm |
+| Database | PostgreSQL 16 |
+| ORM | TypeORM + migrations |
+| Configuration | `@nestjs/config` + Zod |
+| Validation | `class-validator` + `class-transformer` |
+| Documentation | Swagger / OpenAPI |
+| Testing | Vitest |
+| Quality | oxlint + Prettier |
+| Security | Helmet + CORS |
+| Infrastructure | Docker + Docker Compose |
 
-## Project setup
+## Architecture
 
-```bash
-$ npm install
+Every functional domain lives in its own module under `src/modules/`. Controllers
+receive the request and delegate; business logic lives in services; database access
+goes exclusively through TypeORM repositories.
+
+```
+HTTP Request -> Controller -> Service -> Repository -> PostgreSQL
 ```
 
-## Compile and run the project
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+```
+src/
+├── config/          environment, database and swagger configuration
+├── modules/         one folder per functional domain
+├── app.module.ts
+├── data-source.ts   connection used by the TypeORM CLI
+└── main.ts
 ```
 
-## Run tests
+## Requirements
+
+- Node.js 22 or higher
+- npm
+- Docker and Docker Compose
+- Git
+
+## Getting started
 
 ```bash
-# unit tests
-$ npm run test
+# 1. Clone and enter the project
+git clone https://github.com/Nesdael/Restaurante-grupo3.git
+cd Restaurante-grupo3
 
-# e2e tests
-$ npm run test:e2e
+# 2. Create your environment file
+cp .env.example .env
 
-# test coverage
-$ npm run test:cov
+# 3. Install dependencies
+npm install
+
+# 4. Start PostgreSQL
+docker compose up -d postgres
+
+# 5. Run the migrations
+npm run migration:run
+
+# 6. Start the API in watch mode
+npm run start:dev
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Check that everything is up:
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+curl http://localhost:3000/api/v1/health
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Expected response:
 
-## Observability
+```json
+{ "status": "ok", "service": "restaurant-api" }
+```
 
-In production applications, observability is essential for understanding how your system behaves, detecting issues early, and maintaining reliable performance.
+Interactive documentation: http://localhost:3000/api/docs
 
-[NestJS Observe](https://observe.nestjs.com) automatically instruments your NestJS application, giving you deep visibility into your system with minimal setup:
+### Running everything in Docker
 
-- **Distributed tracing:** Follow requests across services and understand how they flow through your system.
-- **Waterfall analysis:** Visualize request execution and identify slow operations, bottlenecks, and unexpected delays.
-- **Performance analysis:** Analyze application performance in real time and quickly pinpoint areas that need optimization.
-- **Metrics:** Track key application and infrastructure metrics to understand system health and performance trends.
-- **Logging:** Centralize and correlate logs with traces and other telemetry to make debugging easier.
-- **Error tracking:** Detect errors quickly and investigate their root causes with the surrounding context.
-- **SLA monitoring:** Track service-level objectives and identify when your application is approaching or exceeding defined thresholds.
-- **Alarms and alerts:** Set up alerts for critical errors, performance degradation, SLA violations, and other anomalies so your team can react quickly.
+```bash
+docker compose up -d --build
+```
 
-## Resources
+This starts PostgreSQL and the API together. Inside the Docker network the database
+host is `postgres`, not `localhost` — Docker Compose already sets that for you.
 
-Check out a few resources that may come in handy when working with NestJS:
+## Environment variables
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Auto-instrument your application with [NestJS Observer](https://observer.nestjs.com). Distributed tracing, metrics, and logging made easy. Error tracking and performance monitoring for your NestJS applications.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+| Variable | Required | Description | Example |
+|---|---|---|---|
+| `APP_PORT` | yes | Port the API listens on | `3000` |
+| `APP_NODE` | yes | `development`, `test` or `production` | `development` |
+| `CORS_ORIGIN` | yes | Allowed origins, comma separated | `http://localhost:5173` |
+| `DB_HOST` | yes | PostgreSQL host | `localhost` |
+| `DB_PORT` | yes | PostgreSQL port | `5432` |
+| `DB_USER` | yes | Database user | `postgres` |
+| `DB_PASSWORD` | yes | Database password | `postgres` |
+| `DB_NAME` | yes | Database name | `restaurant` |
+| `OBSERVE_APP_KEY` | no | NestJS Observe key | |
+| `OBSERVE_APP_SECRET` | no | NestJS Observe secret | |
+| `OBSERVE_SERVICE_ID` | no | NestJS Observe service id | |
 
-## Support
+The application validates these on startup and refuses to boot if a required one is
+missing or malformed. `.env` is never committed; every new variable must be added to
+this table and to `.env.example`.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Scripts
 
-## Stay in touch
+| Command | Description |
+|---|---|
+| `npm run start:dev` | Development server with hot reload |
+| `npm run build` | Compile the project |
+| `npm run test` | Unit tests |
+| `npm run test:e2e` | End to end tests |
+| `npm run test:cov` | Tests with coverage report |
+| `npm run lint` | Static analysis |
+| `npm run format` | Format with Prettier |
+| `npm run migration:generate -- src/database/migrations/<Name>` | Create a migration from entity changes |
+| `npm run migration:run` | Apply pending migrations |
+| `npm run migration:revert` | Roll back the last migration |
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## Database
 
-## License
+The schema is defined by the entities in `src/modules/**/entities/`. `synchronize` is
+disabled: every structural change must be represented by a versioned migration.
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+npm run migration:generate -- src/database/migrations/AddTablesTable
+npm run migration:run
+```
+
+Manual changes to the database structure that are not captured in a migration are not
+allowed.
+
+## API
+
+All resources are served under the `/api/v1` prefix.
+
+| Resource | Base | User story |
+|---|---|---|
+| Health check | `GET /api/v1/health` | HU-001 |
+| Tables | `/api/v1/tables` | HU-002 |
+| Categories | `/api/v1/categories` | HU-003 |
+| Products | `/api/v1/products` | HU-004 |
+| Public menu | `/api/v1/menu` | HU-005 |
+| Reservations | `/api/v1/reservations` | HU-006 to HU-010 |
+
+Only the health check is implemented so far.
+
+## Contributing
+
+Branch names, commit messages and pull requests follow the conventions in
+[CONTRIBUTING.md](./CONTRIBUTING.md). Nobody pushes directly to `main` or `develop`.
+
+## Team
+
+| Member | Module |
+|---|---|
+| Nestor Duran | Scrum Master · `reservations/` |
+| ca | `tables/` |
+| ce | `categories/` |
+| ja | `products/` |
+| ke | `customers/` |

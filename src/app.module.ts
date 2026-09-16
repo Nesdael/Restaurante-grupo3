@@ -1,31 +1,40 @@
 import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { createObserveModule } from '@nestjs/observe';
+
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { ConfigModule, ConfigService } from '@nestjs/config';
-import { EnvConfig, envValidationSchema } from './config/index.js';
+import { EnvConfig, validateEnv, databaseConfiguration } from './config/index.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
 @Module({
   imports: [
-    // Distributed tracing, auto-correlated logs, request/job metrics, error
-    // telemetry, alarms, and more — out of the box. Sign up at https://observe.nestjs.com
+    // Reads the .env file, validates it and makes it available app-wide.
     ConfigModule.forRoot({
       isGlobal: true,
       load: [EnvConfig],
-      validationSchema: envValidationSchema
+      validate: validateEnv,
     }),
+
+    // PostgreSQL connection. Feature modules hook into this one.
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule, ],
+      inject: [ConfigService],
+      useFactory: databaseConfiguration,
+    }),
+
+    // NestJS telemetry
     ObserveModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (observeConfig: ConfigService) => ({
-        ...observeConfig.getOrThrow('observe')
-      })
-
+      useFactory: (config: ConfigService) => ({
+        ...config.getOrThrow('observe'),
+      }),
     }),
   ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule { }
+export class AppModule {}
