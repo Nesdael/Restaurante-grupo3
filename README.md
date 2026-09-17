@@ -155,7 +155,7 @@ All resources are served under the `/api/v1` prefix.
 | Public menu | `/api/v1/menu` | HU-005 |
 | Reservations | `/api/v1/reservations` | HU-006 to HU-010 |
 
-Only the health check is implemented so far.
+Health check and tables are implemented so far.
 
 ## Contributing
 

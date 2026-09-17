@@ -6,6 +6,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { EnvConfig, validateEnv, databaseConfiguration } from './config/index.js';
+import { TablesModule } from './modules/tables/tables.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -33,6 +34,9 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         ...config.getOrThrow('observe'),
       }),
     }),
+
+    // Tables (HU-002)
+    TablesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
