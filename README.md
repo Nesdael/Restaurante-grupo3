@@ -157,6 +157,21 @@ All resources are served under the `/api/v1` prefix.
 
 Health check and tables are implemented so far.
 
+### Tables — HU-002
+
+Management of the restaurant physical tables.
+
+| Method | Path               | Description |
+|--------|--------------------|-------------|
+| POST   | /tables            | Register a table |
+| GET    | /tables            | List, filtering by status, zone and capacity |
+| GET    | /tables/:id        | Get one table |
+| PATCH  | /tables/:id        | Update a table |
+| PATCH  | /tables/:id/status | Change the status |
+
+Statuses: `AVAILABLE`, `OCCUPIED`, `OUT_OF_SERVICE`.
+A new table starts as `AVAILABLE` and its number is unique.
+
 ## Contributing
 
 Branch names, commit messages and pull requests follow the conventions in
