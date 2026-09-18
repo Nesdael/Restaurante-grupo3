@@ -13,7 +13,7 @@ export class Table {
   @Column({ type: 'int' })
   capacity: number;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 50 })
   zone: string;
 
   // RN-018: a new table is AVAILABLE by default.
