@@ -21,7 +21,7 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
     // PostgreSQL connection. Feature modules hook into this one.
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule, ],
+      imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: databaseConfiguration,
     }),
