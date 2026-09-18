@@ -8,5 +8,6 @@ import { TablesController } from './tables.controller.js';
   imports: [TypeOrmModule.forFeature([Table])],
   controllers: [TablesController],
   providers: [TablesService],
+  exports: [TablesService],
 })
 export class TablesModule {}
