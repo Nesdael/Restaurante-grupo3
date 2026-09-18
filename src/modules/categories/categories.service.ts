@@ -10,7 +10,7 @@ import { Category } from './entities/category.entity.js';
 import { CategoryStatus } from './enums/category-status.enum.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
-import { UpdateCategoryStatusDto } from './dto/update-category-status-dto.js';
+import { UpdateCategoryStatusDto } from './dto/update-category-status.dto.js';
 
 @Injectable()
 export class CategoriesService {

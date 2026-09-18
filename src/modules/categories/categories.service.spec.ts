@@ -1,6 +1,6 @@
 import { ConflictException, NotFoundException } from '@nestjs/common';
 
-import { CategoriesService } from './category.service.js';
+import { CategoriesService } from './categories.service.js';
 import { CategoryStatus } from './enums/category-status.enum.js';
 
 // Minimal repository double: only the methods the service touches.
