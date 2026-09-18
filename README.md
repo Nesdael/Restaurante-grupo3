@@ -162,6 +162,30 @@ Only the health check is implemented so far.
 Branch names, commit messages and pull requests follow the conventions in
 [CONTRIBUTING.md](./CONTRIBUTING.md). Nobody pushes directly to `main` or `develop`.
 
+
+
+
+
+
+
+
+### Category — HU-003
+
+Management of the restaurant physical tables.
+
+| Method | Path               | Description |
+|--------|--------------------|-------------|
+| POST   | /api/v1/categories | Register category in table |
+| GET    | /api/v1/categories | List, filtering by status |
+| GET    | /api/v1/categories/{id}  | Get one table by id|
+| PATCH  | /api/v1/categories/{id}       | Update a table by id|
+| PATCH  | /api/v1/categories/{id}/status | Change the status |
+
+Statuses: `Active`, `Inactive`.
+A new table starts as `Active` and its name is unique.
+
+
+
 ## Team
 
 | Member | Module |

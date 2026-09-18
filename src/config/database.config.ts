@@ -21,5 +21,5 @@ export const databaseConfiguration = (
   password: config.getOrThrow<string>('database.password'),
   database: config.getOrThrow<string>('database.name'),
   autoLoadEntities: true,
-  synchronize: false,
+  synchronize: true,
 });

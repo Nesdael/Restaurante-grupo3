@@ -6,6 +6,7 @@ import { createObserveModule } from '@nestjs/observe';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { EnvConfig, validateEnv, databaseConfiguration } from './config/index.js';
+import { CategoryModule } from './category/category.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -33,6 +34,8 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
         ...config.getOrThrow('observe'),
       }),
     }),
+
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
