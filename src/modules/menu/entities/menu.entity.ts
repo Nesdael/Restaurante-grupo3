@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
 } from 'typeorm';
-import { Category } from '../../categories/entities/category.entity.js';
+import type { Category } from '../../categories/entities/category.entity.js';
 import { CategoryStatus } from '../../categories/enums/category-status.enum.js';
 import { MenuAvailability } from '../enum/menu-status.enum.js';
 
@@ -19,7 +19,7 @@ export class Product {
   @Column({ type: 'uuid' })
   categoryId: string;
 
-  @ManyToOne(() => Category, (category) => category.products)
+  @ManyToOne('Category', (category: any) => category.products)
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
@@ -32,7 +32,6 @@ export class Product {
   @Column({ type: 'numeric', precision: 10, scale: 2 })
   price: number;
 
-  // RN-032: Product status required to filter ACTIVE products
   @Column({
     type: 'enum',
     enum: CategoryStatus,
@@ -40,7 +39,6 @@ export class Product {
   })
   status: CategoryStatus;
 
-  // RN-033: Product availability in the menu
   @Column({
     type: 'enum',
     enum: MenuAvailability,
