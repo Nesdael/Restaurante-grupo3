@@ -18,7 +18,7 @@ describe('MenuService', () => {
     description: 'Cold and hot drinks',
     status: CategoryStatus.ACTIVE,
     products: [],
-  } as Category;
+  } as unknown as Category;
 
   const mockProduct = {
     id: 'prod-uuid-1',
