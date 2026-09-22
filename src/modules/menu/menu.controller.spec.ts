@@ -1,100 +1,48 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+import { ProductAvailability } from '../products/enums/product-availability.enum.js';
 import { MenuController } from './menu.controller.js';
 import { MenuService } from './menu.service.js';
 
 describe('MenuController', () => {
   let controller: MenuController;
-  let service: MenuService;
 
-  const mockMenuService = {
-    getFullMenu: vi.fn(),
-    getActiveCategories: vi.fn(),
-    getProductsByCategory: vi.fn(),
-    getProductById: vi.fn(),
-  };
-
-  const mockCategory = {
-    id: 'cat-uuid-1',
-    name: 'Beverages',
-  };
-
-  const mockProduct = {
-    id: 'prod-uuid-1',
-    name: 'Iced Coffee',
-    description: 'Cold brewed coffee with milk',
-    price: 4.5,
-    availability: 'AVAILABLE',
+  const serviceMock = {
+    getFullMenu: vi.fn().mockResolvedValue([]),
+    getActiveCategories: vi.fn().mockResolvedValue([]),
+    getProductsByCategory: vi.fn().mockResolvedValue([]),
+    getProduct: vi.fn().mockResolvedValue({ id: 'p1' }),
   };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [MenuController],
-      providers: [
-        {
-          provide: MenuService,
-          useValue: mockMenuService,
-        },
-      ],
+      providers: [{ provide: MenuService, useValue: serviceMock }],
     }).compile();
 
     controller = module.get<MenuController>(MenuController);
-    service = module.get<MenuService>(MenuService);
-
-    vi.clearAllMocks();
   });
 
-  it('should be defined', () => {
-    expect(controller).toBeDefined();
+  it('returns the full menu', async () => {
+    const query = { availability: ProductAvailability.AVAILABLE };
+
+    await expect(controller.getFullMenu(query)).resolves.toEqual([]);
+    expect(serviceMock.getFullMenu).toHaveBeenCalledWith(query);
   });
 
-  describe('getFullMenu', () => {
-    it('should call MenuService.getFullMenu and return the full menu', async () => {
-      const expectedResult = [{ ...mockCategory, products: [mockProduct] }];
-      mockMenuService.getFullMenu.mockResolvedValue(expectedResult);
-
-      const result = await controller.getFullMenu();
-
-      expect(service.getFullMenu).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(expectedResult);
-    });
+  it('returns the active categories', async () => {
+    await expect(controller.getActiveCategories()).resolves.toEqual([]);
   });
 
-  describe('getActiveCategories', () => {
-    it('should call MenuService.getActiveCategories and return active categories', async () => {
-      const expectedResult = [mockCategory];
-      mockMenuService.getActiveCategories.mockResolvedValue(expectedResult);
-
-      const result = await controller.getActiveCategories();
-
-      expect(service.getActiveCategories).toHaveBeenCalledTimes(1);
-      expect(result).toEqual(expectedResult);
-    });
+  it('returns the products of a category', async () => {
+    await controller.getProductsByCategory('drinks', {});
+    expect(serviceMock.getProductsByCategory).toHaveBeenCalledWith(
+      'drinks',
+      {},
+    );
   });
 
-  describe('getProductsByCategory', () => {
-    it('should call MenuService.getProductsByCategory with categoryId', async () => {
-      const categoryId = 'cat-uuid-1';
-      const expectedResult = { category: 'Beverages', products: [mockProduct] };
-      mockMenuService.getProductsByCategory.mockResolvedValue(expectedResult);
-
-      const result = await controller.getProductsByCategory(categoryId);
-
-      expect(service.getProductsByCategory).toHaveBeenCalledWith(categoryId);
-      expect(result).toEqual(expectedResult);
-    });
-  });
-
-  describe('getProductById', () => {
-    it('should call MenuService.getProductById with product id', async () => {
-      const productId = 'prod-uuid-1';
-      const expectedResult = { ...mockProduct, category: mockCategory };
-      mockMenuService.getProductById.mockResolvedValue(expectedResult);
-
-      const result = await controller.getProductById(productId);
-
-      expect(service.getProductById).toHaveBeenCalledWith(productId);
-      expect(result).toEqual(expectedResult);
-    });
+  it('returns one product', async () => {
+    await expect(controller.getProduct('p1')).resolves.toEqual({ id: 'p1' });
   });
 });

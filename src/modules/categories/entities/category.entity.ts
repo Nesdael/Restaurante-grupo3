@@ -1,12 +1,5 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
-import type { Product } from '../../menu/entities/menu.entity.js';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Product } from '../../products/entities/product.entity.js';
 import { CategoryStatus } from '../enums/category-status.enum.js';
 
 @Entity('categories')
@@ -24,12 +17,6 @@ export class Category {
   })
   status: CategoryStatus;
 
-  @OneToMany('Product', (product: any) => product.category)
+  @OneToMany(() => Product, (product) => product.category)
   products: Product[];
-
-  @CreateDateColumn({ type: 'timestamptz' })
-  createdAt: Date;
-
-  @UpdateDateColumn({ type: 'timestamptz' })
-  updatedAt: Date;
 }

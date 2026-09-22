@@ -5,6 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
+  type Relation,
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity.js';
 import { ProductAvailability } from '../enums/product-availability.enum.js';
@@ -54,5 +55,5 @@ export class Product {
 
   @ManyToOne(() => Category, { nullable: false, onDelete: 'RESTRICT' })
   @JoinColumn({ name: 'categoryId' })
-  category: Category;
+  category: Relation<Category>;
 }
