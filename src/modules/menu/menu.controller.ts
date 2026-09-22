@@ -1,34 +1,53 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { MenuService } from './menu.service.js';
-import { CreateMenuDto } from './dto/create-menu.dto.js';
-import { UpdateMenuDto } from './dto/update-menu.dto.js';
 
+@ApiTags('menu')
 @Controller('menu')
 export class MenuController {
   constructor(private readonly menuService: MenuService) {}
 
-  @Post()
-  create(@Body() createMenuDto: CreateMenuDto) {
-    return this.menuService.create(createMenuDto);
-  }
-
+  // GET /api/v1/menu
   @Get()
-  findAll() {
-    return this.menuService.findAll();
+  @ApiOperation({
+    summary: 'Get full public menu grouped by active categories',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns full menu grouped by active category.',
+  })
+  getFullMenu() {
+    return this.menuService.getFullMenu();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.menuService.findOne(+id);
+  // GET /api/v1/menu/categories
+  @Get('categories')
+  @ApiOperation({ summary: 'Get all active categories' })
+  @ApiResponse({
+    status: 200,
+    description: 'Returns list of active categories.',
+  })
+  getActiveCategories() {
+    return this.menuService.getActiveCategories();
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMenuDto: UpdateMenuDto) {
-    return this.menuService.update(+id, updateMenuDto);
+  // GET /api/v1/menu/categories/:categoryId/products
+  @Get('categories/:categoryId/products')
+  @ApiOperation({
+    summary: 'Get active products for a specific active category',
+  })
+  @ApiResponse({ status: 200, description: 'Returns category products.' })
+  @ApiResponse({ status: 404, description: 'Category not found or inactive.' })
+  getProductsByCategory(@Param('categoryId') categoryId: string) {
+    return this.menuService.getProductsByCategory(categoryId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.menuService.remove(+id);
+  // GET /api/v1/menu/products/:id
+  @Get('products/:id')
+  @ApiOperation({ summary: 'Get details of a single active product' })
+  @ApiResponse({ status: 200, description: 'Returns product details.' })
+  @ApiResponse({ status: 404, description: 'Product not found or inactive.' })
+  getProductById(@Param('id') id: string) {
+    return this.menuService.getProductById(id);
   }
 }

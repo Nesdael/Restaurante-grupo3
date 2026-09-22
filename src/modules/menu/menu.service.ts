@@ -1,26 +1,124 @@
-import { Injectable } from '@nestjs/common';
-import { CreateMenuDto } from './dto/create-menu.dto.js';
-import { UpdateMenuDto } from './dto/update-menu.dto.js';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Product } from './entities/menu.entity.js';
+import { Category } from '../categories/entities/category.entity.js';
+import { CategoryStatus } from '../categories/enums/category-status.enum.js';
 
 @Injectable()
 export class MenuService {
-  create(createMenuDto: CreateMenuDto) {
-    return 'This action adds a new menu';
+  constructor(
+    @InjectRepository(Product)
+    private readonly productRepository: Repository<Product>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
+  ) {}
+
+  /**
+   * GET /api/v1/menu
+   * RN-031, RN-032, RN-033, RN-034, RN-035
+   */
+  async getFullMenu(): Promise<Category[]> {
+    return this.categoryRepository.find({
+      where: {
+        status: CategoryStatus.ACTIVE, // RN-031: Only active categories
+      },
+      relations: {
+        Product: true, // RN-034: Grouped by category
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all menu`;
+  /**
+   * GET /api/v1/menu/categories
+   * RN-031
+   */
+  async getActiveCategories(): Promise<Category[]> {
+    return this.categoryRepository.find({
+      where: {
+        status: CategoryStatus.ACTIVE, // RN-031
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} menu`;
+  /**
+   * GET /api/v1/menu/categories/:categoryId/products
+   * RN-031, RN-032, RN-033
+   */
+  async getProductsByCategory(categoryId: string): Promise<Product[]> {
+    // 1. Verify that parent category exists and is active (RN-031)
+    const category = await this.categoryRepository.findOne({
+      where: {
+        id: categoryId,
+        status: CategoryStatus.ACTIVE,
+      },
+    });
+
+    if (!category) {
+      throw new NotFoundException(
+        `Category with ID ${categoryId} not found or inactive`,
+      );
+    }
+
+    // 2. Retrieve active products for this category (RN-032, RN-033)
+    return this.productRepository.find({
+      where: {
+        categoryId,
+        status: CategoryStatus.ACTIVE, // RN-032
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        availability: true, // RN-033
+      },
+    });
   }
 
-  update(id: number, updateMenuDto: UpdateMenuDto) {
-    return `This action updates a #${id} menu`;
-  }
+  /**
+   * GET /api/v1/menu/products/:id
+   * RN-031, RN-032, RN-033
+   */
+  async getProductById(id: string): Promise<Product> {
+    const product = await this.productRepository.findOne({
+      where: {
+        id, // Search by product ID
+        status: CategoryStatus.ACTIVE, // RN-032: Product must be ACTIVE
+        category: {
+          status: CategoryStatus.ACTIVE, // RN-031: Parent category must be ACTIVE
+        },
+      },
+      relations: {
+        category: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        price: true,
+        availability: true, // RN-033
+        category: {
+          id: true,
+          name: true,
+        },
+      },
+    });
 
-  remove(id: number) {
-    return `This action removes a #${id} menu`;
+    if (!product) {
+      throw new NotFoundException(
+        `Product with ID ${id} not found or inactive`,
+      );
+    }
+
+    return product;
   }
 }
