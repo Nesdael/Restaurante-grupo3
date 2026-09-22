@@ -155,7 +155,7 @@ All resources are served under the `/api/v1` prefix.
 | Public menu | `/api/v1/menu` | HU-005 |
 | Reservations | `/api/v1/reservations` | HU-006 to HU-010 |
 
-Health check and tables are implemented so far.
+Health check, tables, categories and products are implemented so far.
 
 ### Tables — HU-002
 
@@ -172,18 +172,6 @@ Management of the restaurant physical tables.
 Statuses: `AVAILABLE`, `OCCUPIED`, `OUT_OF_SERVICE`.
 A new table starts as `AVAILABLE` and its number is unique.
 
-## Contributing
-
-Branch names, commit messages and pull requests follow the conventions in
-[CONTRIBUTING.md](./CONTRIBUTING.md). Nobody pushes directly to `main` or `develop`.
-
-
-
-
-
-
-
-
 ### Category — HU-003
 
 Management of the restaurant physical tables.
@@ -199,14 +187,35 @@ Management of the restaurant physical tables.
 Statuses: `Active`, `Inactive`.
 A new table starts as `Active` and its name is unique.
 
+### Products — HU-004
 
+Management of the restaurant menu products.
+
+| Method | Path                          | Description |
+|--------|-------------------------------|-------------|
+| POST   | /api/v1/products              | Create a menu product |
+| GET    | /api/v1/products               | List every product |
+| GET    | /api/v1/products/{id}          | Get one product by id |
+| PATCH  | /api/v1/products/{id}          | Update a product |
+| PATCH  | /api/v1/products/{id}/status   | Activate or deactivate a product |
+| PATCH  | /api/v1/products/{id}/availability | Change the availability of a product |
+
+Statuses: `ACTIVE`, `INACTIVE`. A new product starts as `ACTIVE` (RN-027).
+Availability: `AVAILABLE`, `UNAVAILABLE`. A new product starts as `AVAILABLE` (RN-028).
+Every product must belong to an existing category (RN-025), and its price must be
+greater than zero (RN-026).
+
+## Contributing
+
+Branch names, commit messages and pull requests follow the conventions in
+[CONTRIBUTING.md](./CONTRIBUTING.md). Nobody pushes directly to `main` or `develop`.
 
 ## Team
 
-| Member | Module |
+| Member | Role |
 |---|---|
-| Nestor Duran | Scrum Master · `reservations/` |
-| ca | `tables/` |
-| ce | `categories/` |
-| ja | `products/` |
-| ke | `customers/` |
+| Nestor Duran | Scrum Master |
+| Camilo Meza | Backend Developer |
+| Cesar Vega | Backend Developer |
+| Jaime Villanova | Backend Developer |
+| Kevin Mercado | Backend Developer |
