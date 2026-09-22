@@ -9,7 +9,7 @@ import {
 } from 'typeorm';
 import { Category } from '../../categories/entities/category.entity.js';
 import { CategoryStatus } from '../../categories/enums/category-status.enum.js';
-import { MenuAvailability } from '../enum/menu-status.enum.ts.js';
+import { MenuAvailability } from '../enum/menu-status.enum.js';
 
 @Entity('products')
 export class Product {

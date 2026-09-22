@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 import { CategoryStatus } from '../enums/category-status.enum.js';
+import { Product } from '../../menu/entities/menu.entity.js';
 
 @Entity('categories')
 export class Category {
@@ -20,4 +21,8 @@ export class Category {
     default: CategoryStatus.ACTIVE,
   })
   status: CategoryStatus;
+
+  // Relación con Productos (Resuelve el error "Property 'products' does not exist")
+  @OneToMany(() => Product, (product) => product.category)
+  products: Product[];
 }

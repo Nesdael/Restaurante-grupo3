@@ -8,7 +8,7 @@ import {
   Min,
 } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { MenuAvailability } from '../enum/menu-status.enum.ts.js';
+import { MenuAvailability } from '../enum/menu-status.enum.js';
 
 export class CreateMenuDto {
   @ApiProperty({

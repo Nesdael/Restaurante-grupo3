@@ -24,7 +24,7 @@ export class MenuService {
         status: CategoryStatus.ACTIVE, // RN-031: Only active categories
       },
       relations: {
-        Product: true, // RN-034: Grouped by category
+        products: true, // RN-034: Grouped by category
       },
       select: {
         id: true,
