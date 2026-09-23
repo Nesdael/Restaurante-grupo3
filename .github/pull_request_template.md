@@ -21,6 +21,7 @@ User story: HU-
 - [ ] `refactor` — code change without behavior change
 - [ ] `docs` — documentation
 - [ ] `test` — tests
+- [ ] `style` — formatting only, no logic changes
 - [ ] `chore` — config, dependencies, maintenance
 
 ## How to test it
@@ -40,9 +41,10 @@ User story: HU-
 - [ ] `npm run lint` passes with no errors
 - [ ] Input data is validated with DTOs and `class-validator`
 - [ ] Business logic lives in services, not in controllers
-- [ ] Database changes have a versioned Prisma migration
+- [ ] Database changes have a versioned TypeORM migration
 - [ ] New endpoints are documented in Swagger
 - [ ] Added or updated tests and `npm run test` passes
+- [ ] `npm run format:check` passes
 - [ ] All acceptance criteria of the user story are met
 - [ ] `README.md` and `.env.example` updated if needed
 - [ ] My branch is up to date with `develop`
