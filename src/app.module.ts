@@ -14,6 +14,7 @@ import { TablesModule } from './modules/tables/tables.module.js';
 import { CategoriesModule } from './modules/categories/categories.module.js';
 import { ProductsModule } from './modules/products/products.module.js';
 import { MenuModule } from './modules/menu/menu.module.js';
+import { ReservationsModule } from './modules/reservations/reservations.module.js';
 
 export const { ObserveModule, ObserveInstrument } = createObserveModule();
 
@@ -42,11 +43,12 @@ export const { ObserveModule, ObserveInstrument } = createObserveModule();
       }),
     }),
 
-    // Tables (HU-002)
+    // Modules
     TablesModule,
     CategoriesModule,
     ProductsModule,
     MenuModule,
+    ReservationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
