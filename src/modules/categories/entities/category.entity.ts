@@ -1,4 +1,11 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  type Relation,
+} from 'typeorm';
+import { Product } from '../../products/entities/product.entity.js';
 import { CategoryStatus } from '../enums/category-status.enum.js';
 
 @Entity('categories')
@@ -20,4 +27,9 @@ export class Category {
     default: CategoryStatus.ACTIVE,
   })
   status: CategoryStatus;
+
+  // Inverse side of Product.category. It does not create any column:
+  // the foreign key lives in products.categoryId.
+  @OneToMany(() => Product, (product) => product.category)
+  products: Relation<Product[]>;
 }
