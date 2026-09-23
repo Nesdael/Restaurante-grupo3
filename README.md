@@ -64,7 +64,7 @@ npm install
 # 4. Start PostgreSQL
 docker compose up -d postgres
 
-# 5. Run the migrations
+# 5. Run the migrations (optional: the API also applies pending ones when it starts)
 npm run migration:run
 
 # 6. Start the API in watch mode

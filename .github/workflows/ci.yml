@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [develop, main]
+  push:
+    branches: [develop, main]
+
+# A new push to the same PR cancels the run that is still in progress.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    name: Lint, build, tests and migrations
+    runs-on: ubuntu-latest
+
+    # Throwaway PostgreSQL, only for this run.
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: restaurant
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres -d restaurant"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    # Same variables as .env.example, pointing to the service above.
+    env:
+      APP_PORT: 3000
+      APP_NODE: test
+      CORS_ORIGIN: http://localhost:5173
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: restaurant
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Check formatting
+        run: npm run format:check
+
+      - name: Build
+        run: npm run build
+
+      - name: Unit tests with coverage
+        run: npm run test:cov
+
+      - name: Run migrations on an empty database
+        run: npm run migration:run
+
+      # Fails if an entity was changed without its migration
+      # (the kind of bug that broke /categories in HU-005).
+      - name: Check entities and migrations are in sync
+        run: npm run migration:generate -- src/database/migrations/SchemaCheck --check
