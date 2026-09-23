@@ -30,7 +30,9 @@ export class TablesController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'List tables, filtering by status, zone and capacity' })
+  @ApiOperation({
+    summary: 'List tables, filtering by status, zone and capacity',
+  })
   @ApiResponse({ status: 200, description: 'List of tables' })
   findAll(@Query() filters: FilterTablesDto) {
     return this.tablesService.findAll(filters);

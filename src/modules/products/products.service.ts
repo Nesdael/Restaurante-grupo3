@@ -39,7 +39,10 @@ export class ProductsService {
     return product;
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto): Promise<Product> {
+  async update(
+    id: string,
+    updateProductDto: UpdateProductDto,
+  ): Promise<Product> {
     const product = await this.findOne(id);
 
     if (updateProductDto.categoryId) {
@@ -70,7 +73,9 @@ export class ProductsService {
 
   // RN-025: every product must belong to an existing category.
   private async ensureCategoryExists(categoryId: string): Promise<void> {
-    const category = await this.categoriesRepository.findOneBy({ id: categoryId });
+    const category = await this.categoriesRepository.findOneBy({
+      id: categoryId,
+    });
 
     if (!category) {
       throw new NotFoundException(`Category with id ${categoryId} not found`);

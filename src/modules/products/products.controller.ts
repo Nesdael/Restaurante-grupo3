@@ -29,7 +29,10 @@ export class ProductsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a menu product' })
-  @ApiCreatedResponse({ description: 'Product created with status ACTIVE and availability AVAILABLE' })
+  @ApiCreatedResponse({
+    description:
+      'Product created with status ACTIVE and availability AVAILABLE',
+  })
   @ApiNotFoundResponse({ description: 'Category not found' })
   @ApiBadRequestResponse({ description: 'Invalid payload' })
   create(@Body() createProductDto: CreateProductDto) {
@@ -81,6 +84,9 @@ export class ProductsController {
     @Param('id', ParseUUIDPipe) id: string,
     @Body() updateProductAvailabilityDto: UpdateProductAvailabilityDto,
   ) {
-    return this.productsService.updateAvailability(id, updateProductAvailabilityDto);
+    return this.productsService.updateAvailability(
+      id,
+      updateProductAvailabilityDto,
+    );
   }
 }

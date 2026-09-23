@@ -31,7 +31,11 @@ describe('TablesService', () => {
 
   it('forwards only the filters actually sent (TypeORM rejects undefined)', async () => {
     const { service, repo } = buildService(null);
-    await service.findAll({ zone: 'A', status: undefined, capacity: undefined });
+    await service.findAll({
+      zone: 'A',
+      status: undefined,
+      capacity: undefined,
+    });
     expect(repo.findBy).toHaveBeenCalledWith({ zone: 'A' });
   });
 
