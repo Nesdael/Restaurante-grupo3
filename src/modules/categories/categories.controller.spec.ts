@@ -58,7 +58,9 @@ describe('CategoriesController', () => {
   it('updates a category', async () => {
     const dto = { description: 'Updated description' };
 
-    await expect(controller.update(category.id, dto)).resolves.toEqual(category);
+    await expect(controller.update(category.id, dto)).resolves.toEqual(
+      category,
+    );
     expect(service.update).toHaveBeenCalledWith(category.id, dto);
   });
 

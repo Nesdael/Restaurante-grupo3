@@ -42,7 +42,11 @@ describe('ProductsController', () => {
   });
 
   it('creates a product', async () => {
-    const dto = { name: 'Limonada Natural', price: 8.5, categoryId: 'category-uuid' };
+    const dto = {
+      name: 'Limonada Natural',
+      price: 8.5,
+      categoryId: 'category-uuid',
+    };
 
     await expect(controller.create(dto)).resolves.toEqual(product);
     expect(service.create).toHaveBeenCalledWith(dto);
@@ -68,14 +72,18 @@ describe('ProductsController', () => {
   it('updates only the status', async () => {
     const dto = { status: ProductStatus.INACTIVE };
 
-    await expect(controller.updateStatus(product.id, dto)).resolves.toEqual(product);
+    await expect(controller.updateStatus(product.id, dto)).resolves.toEqual(
+      product,
+    );
     expect(service.updateStatus).toHaveBeenCalledWith(product.id, dto);
   });
 
   it('updates only the availability', async () => {
     const dto = { availability: ProductAvailability.UNAVAILABLE };
 
-    await expect(controller.updateAvailability(product.id, dto)).resolves.toEqual(product);
+    await expect(
+      controller.updateAvailability(product.id, dto),
+    ).resolves.toEqual(product);
     expect(service.updateAvailability).toHaveBeenCalledWith(product.id, dto);
   });
 });

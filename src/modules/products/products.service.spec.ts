@@ -24,7 +24,10 @@ const buildService = (existingCategory: unknown = { id: 'category-uuid' }) => {
   };
 
   return {
-    service: new ProductsService(productsRepo as never, categoriesRepo as never),
+    service: new ProductsService(
+      productsRepo as never,
+      categoriesRepo as never,
+    ),
     productsRepo,
     categoriesRepo,
   };
@@ -48,7 +51,11 @@ describe('ProductsService', () => {
     const { service } = buildService(null);
 
     await expect(
-      service.create({ name: 'Limonada Natural', price: 8.5, categoryId: 'missing' }),
+      service.create({
+        name: 'Limonada Natural',
+        price: 8.5,
+        categoryId: 'missing',
+      }),
     ).rejects.toBeInstanceOf(NotFoundException);
   });
 
@@ -56,7 +63,9 @@ describe('ProductsService', () => {
     const { service, productsRepo } = buildService();
     productsRepo.findOneBy.mockResolvedValue(null);
 
-    await expect(service.findOne('missing')).rejects.toBeInstanceOf(NotFoundException);
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 
   it('changes the status of an existing product', async () => {
@@ -89,7 +98,10 @@ describe('ProductsService', () => {
 
   it('rejects an update that moves the product to a category that does not exist (RN-025)', async () => {
     const { service, productsRepo, categoriesRepo } = buildService();
-    productsRepo.findOneBy.mockResolvedValue({ id: 'product-uuid', categoryId: 'category-uuid' });
+    productsRepo.findOneBy.mockResolvedValue({
+      id: 'product-uuid',
+      categoryId: 'category-uuid',
+    });
     categoriesRepo.findOneBy.mockResolvedValue(null);
 
     await expect(

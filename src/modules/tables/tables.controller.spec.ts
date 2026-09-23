@@ -68,7 +68,9 @@ describe('TablesController', () => {
   it('updates only the status', async () => {
     const dto = { status: TableStatus.OCCUPIED };
 
-    await expect(controller.updateStatus(table.id, dto)).resolves.toEqual(table);
+    await expect(controller.updateStatus(table.id, dto)).resolves.toEqual(
+      table,
+    );
     expect(service.updateStatus).toHaveBeenCalledWith(table.id, dto);
   });
 });

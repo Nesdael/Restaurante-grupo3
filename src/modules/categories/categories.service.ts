@@ -66,7 +66,10 @@ export class CategoriesService {
   }
 
   // RN-021: category name must be unique.
-  private async ensureNameIsFree(name: string, excludeId?: string): Promise<void> {
+  private async ensureNameIsFree(
+    name: string,
+    excludeId?: string,
+  ): Promise<void> {
     const existing = await this.categoriesRepository.findOneBy(
       excludeId ? { name, id: Not(excludeId) } : { name },
     );
