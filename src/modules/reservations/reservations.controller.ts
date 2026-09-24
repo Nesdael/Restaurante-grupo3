@@ -1,6 +1,7 @@
-import { Controller } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Query } from '@nestjs/common';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+import { CheckAvailabilityDto } from './dto/check-availability.dto.js';
 import { ReservationsService } from './reservations.service.js';
 
 /**
@@ -22,4 +23,19 @@ import { ReservationsService } from './reservations.service.js';
 @Controller('reservations')
 export class ReservationsController {
   constructor(private readonly reservationsService: ReservationsService) {}
+
+  // Declared before GET /reservations/:id (HU-008) on purpose, so Nest does not
+  // read "availability" as an id.
+  @Get('availability')
+  @ApiOperation({
+    summary: 'Check table availability for a date-time and party size',
+  })
+  @ApiResponse({ status: 200, description: 'Availability result' })
+  @ApiResponse({
+    status: 400,
+    description: 'Invalid or past date, or party size not greater than zero',
+  })
+  checkAvailability(@Query() query: CheckAvailabilityDto) {
+    return this.reservationsService.checkAvailability(query);
+  }
 }
