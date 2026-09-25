@@ -1,6 +1,6 @@
 import { BadRequestException } from '@nestjs/common';
 
-import { ReservationsService } from './reservations.service.js';
+import { ReservationsService, toStartsAt } from './reservations.service.js';
 
 // Minimal repository doubles. Each story adds the methods it needs.
 const buildService = (
@@ -24,15 +24,20 @@ const buildService = (
   };
 };
 
-// A datetime safely in the future, so RN-037 does not reject the query.
-const futureDate = () =>
-  new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+// A date safely in the future, so RN-037 does not reject the query.
+const futureQuery = { date: '2099-10-01', time: '19:00', guests: 2 };
 
 describe('ReservationsService', () => {
   it('is defined', () => {
     const { service } = buildService();
 
     expect(service).toBeDefined();
+  });
+
+  it('reads date and time as Colombia time (UTC-5)', () => {
+    expect(toStartsAt('2026-10-01', '19:00').toISOString()).toBe(
+      '2026-10-02T00:00:00.000Z',
+    );
   });
 
   it('finds only AVAILABLE tables with capacity >= guests (RN-038, RN-039)', async () => {
@@ -63,7 +68,8 @@ describe('ReservationsService', () => {
 
     await expect(
       service.checkAvailability({
-        startsAt: '2000-01-01T19:00:00-05:00',
+        date: '2000-01-01',
+        time: '19:00',
         guests: 2,
       }),
     ).rejects.toBeInstanceOf(BadRequestException);
@@ -72,10 +78,7 @@ describe('ReservationsService', () => {
   it('reports clear messaging when no table is available', async () => {
     const { service } = buildService([]);
 
-    const result = await service.checkAvailability({
-      startsAt: futureDate(),
-      guests: 2,
-    });
+    const result = await service.checkAvailability(futureQuery);
 
     expect(result.available).toBe(false);
     expect(result.count).toBe(0);
@@ -85,10 +88,7 @@ describe('ReservationsService', () => {
   it('returns the free tables when there is availability', async () => {
     const { service } = buildService([{ id: 't1' }, { id: 't2' }]);
 
-    const result = await service.checkAvailability({
-      startsAt: futureDate(),
-      guests: 2,
-    });
+    const result = await service.checkAvailability(futureQuery);
 
     expect(result.available).toBe(true);
     expect(result.count).toBe(2);

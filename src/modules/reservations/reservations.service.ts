@@ -18,6 +18,14 @@ import { ReservationStatus } from './enums/reservation-status.enum.js';
 // How long a reservation keeps its table busy.
 export const RESERVATION_DURATION_MINUTES = 120;
 
+// Dates and times are always Colombia time (UTC-5, no daylight saving).
+export const RESTAURANT_UTC_OFFSET = '-05:00';
+
+// Turns a date (YYYY-MM-DD) and time (HH:mm) in Colombia time into startsAt.
+// Shared by HU-006, HU-007 and HU-009.
+export const toStartsAt = (date: string, time: string): Date =>
+  new Date(`${date}T${time}:00${RESTAURANT_UTC_OFFSET}`);
+
 // Statuses that keep a table busy. CANCELLED and NO_SHOW free it (RN-063, RN-079).
 export const BLOCKING_STATUSES = [
   ReservationStatus.PENDING,
@@ -77,13 +85,14 @@ export class ReservationsService {
         capacity: MoreThanOrEqual(guests),
         ...(busyTableIds.length > 0 ? { id: Not(In(busyTableIds)) } : {}),
       },
-      order: { number: 'ASC' },
+      // Smallest table that fits first: HU-007 assigns that one.
+      order: { capacity: 'ASC', number: 'ASC' },
     });
   }
 
   // HU-006: handler for GET /reservations/availability.
   async checkAvailability(query: CheckAvailabilityDto) {
-    const startsAt = new Date(query.startsAt);
+    const startsAt = toStartsAt(query.date, query.time);
 
     // RN-037: a past date or time cannot be queried.
     if (startsAt.getTime() < Date.now()) {
@@ -99,6 +108,8 @@ export class ReservationsService {
     const tables = await this.findFreeTables(startsAt, endsAt, query.guests);
 
     return {
+      date: query.date,
+      time: query.time,
       startsAt,
       endsAt,
       guests: query.guests,
