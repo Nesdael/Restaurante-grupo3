@@ -8,11 +8,13 @@ describe('ReservationsController', () => {
   let service: ReservationsService;
 
   const reservation = { id: 'r1', customerName: 'Carlos Perez' };
+  const cancelledReservation = { ...reservation, status: 'CANCELLED' };
 
   // Each story adds the service methods its endpoints call.
   const serviceMock = {
     findAll: vi.fn().mockResolvedValue([reservation]),
     findOne: vi.fn().mockResolvedValue(reservation),
+    cancel: vi.fn().mockResolvedValue(cancelledReservation),
   };
 
   beforeEach(async () => {
@@ -39,5 +41,12 @@ describe('ReservationsController', () => {
       reservation,
     );
     expect(service.findOne).toHaveBeenCalledWith(reservation.id);
+  });
+
+  it('cancels a reservation', async () => {
+    await expect(controller.cancel(reservation.id)).resolves.toEqual(
+      cancelledReservation,
+    );
+    expect(service.cancel).toHaveBeenCalledWith(reservation.id);
   });
 });

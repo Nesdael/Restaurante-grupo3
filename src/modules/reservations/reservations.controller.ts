@@ -1,5 +1,13 @@
-import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
 import {
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Patch,
+  Query,
+} from '@nestjs/common';
+import {
+  ApiConflictResponse,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -58,5 +66,16 @@ export class ReservationsController {
   @ApiNotFoundResponse({ description: 'Reservation not found' })
   findOne(@Param('id', ParseUUIDPipe) id: string) {
     return this.reservationsService.findOne(id);
+  }
+
+  @Patch(':id/cancel')
+  @ApiOperation({ summary: 'Cancel a reservation' })
+  @ApiOkResponse({ description: 'Reservation cancelled' })
+  @ApiNotFoundResponse({ description: 'Reservation not found' })
+  @ApiConflictResponse({
+    description: 'Reservation already cancelled, checked in or completed',
+  })
+  cancel(@Param('id', ParseUUIDPipe) id: string) {
+    return this.reservationsService.cancel(id);
   }
 }

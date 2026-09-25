@@ -1,4 +1,8 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 
 import { ReservationsService, toStartsAt } from './reservations.service.js';
 
@@ -10,6 +14,7 @@ const buildService = (
   const reservationsRepo = {
     find: vi.fn().mockResolvedValue(overlapping),
     findOne: vi.fn().mockResolvedValue(null),
+    save: vi.fn((entity) => Promise.resolve(entity)),
   };
   const tablesRepo = {
     find: vi.fn().mockResolvedValue(freeTables),
@@ -118,6 +123,55 @@ describe('ReservationsService', () => {
 
     await expect(service.findOne('missing')).rejects.toBeInstanceOf(
       NotFoundException,
+    );
+  });
+
+  it('cancels a PENDING reservation and records the timestamp (RN-062, RN-064)', async () => {
+    const { service, reservationsRepo } = buildService();
+    reservationsRepo.findOne.mockResolvedValue({
+      id: 'r1',
+      status: 'PENDING',
+    });
+
+    const reservation = await service.cancel('r1');
+
+    expect(reservation.status).toBe('CANCELLED');
+    expect(reservation.cancelledAt).toBeInstanceOf(Date);
+  });
+
+  it('rejects cancelling an already cancelled reservation (RN-060)', async () => {
+    const { service, reservationsRepo } = buildService();
+    reservationsRepo.findOne.mockResolvedValue({
+      id: 'r1',
+      status: 'CANCELLED',
+    });
+
+    await expect(service.cancel('r1')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+  });
+
+  it('rejects cancelling a CHECKED_IN reservation (RN-061)', async () => {
+    const { service, reservationsRepo } = buildService();
+    reservationsRepo.findOne.mockResolvedValue({
+      id: 'r1',
+      status: 'CHECKED_IN',
+    });
+
+    await expect(service.cancel('r1')).rejects.toBeInstanceOf(
+      ConflictException,
+    );
+  });
+
+  it('rejects cancelling a COMPLETED reservation (RN-061)', async () => {
+    const { service, reservationsRepo } = buildService();
+    reservationsRepo.findOne.mockResolvedValue({
+      id: 'r1',
+      status: 'COMPLETED',
+    });
+
+    await expect(service.cancel('r1')).rejects.toBeInstanceOf(
+      ConflictException,
     );
   });
 });
