@@ -127,10 +127,10 @@ export class ReservationsService {
     };
   }
 
-  // HU-008: RN-048 a RN-051.
+  // HU-008: RN-048 to RN-051.
   findAll(): Promise<Reservation[]> {
     return this.reservationsRepository.find({
-      relations: { table: true }, // RN-050: incluir la mesa asignada
+      relations: { table: true }, // RN-050: include the assigned table
       order: { startsAt: 'DESC' },
     });
   }
@@ -145,6 +145,6 @@ export class ReservationsService {
       throw new NotFoundException(`Reservation ${id} not found`); // RN-048
     }
 
-    return reservation; // RN-049, RN-051: se devuelve tal cual, sin filtrar por status
+    return reservation; // RN-049, RN-051: returned as-is, not filtered by status
   }
 }
