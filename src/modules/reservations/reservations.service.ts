@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import {
   In,
@@ -55,7 +59,7 @@ export class ReservationsService {
     private readonly tablesRepository: Repository<Table>,
   ) {}
 
-  // HU-006: tables that can take the party in the requested window.
+  // Tables that can take the party in the requested window.
   // RN-038/RN-041: only AVAILABLE tables. RN-039: capacity >= guests.
   // RN-040: no reservation in BLOCKING_STATUSES overlapping the window.
   // excludeReservationId lets HU-009 update a reservation without it clashing
@@ -90,7 +94,7 @@ export class ReservationsService {
     });
   }
 
-  // HU-006: handler for GET /reservations/availability.
+  // Handler for GET /reservations/availability.
   async checkAvailability(query: CheckAvailabilityDto) {
     const startsAt = toStartsAt(query.date, query.time);
 
@@ -121,5 +125,26 @@ export class ReservationsService {
           ? `${tables.length} table(s) available`
           : 'No tables available for the selected time and party size',
     };
+  }
+
+  // HU-008: RN-048 to RN-051.
+  findAll(): Promise<Reservation[]> {
+    return this.reservationsRepository.find({
+      relations: { table: true }, // RN-050: include the assigned table
+      order: { startsAt: 'DESC' },
+    });
+  }
+
+  async findOne(id: string): Promise<Reservation> {
+    const reservation = await this.reservationsRepository.findOne({
+      where: { id },
+      relations: { table: true }, // RN-050
+    });
+
+    if (!reservation) {
+      throw new NotFoundException(`Reservation ${id} not found`); // RN-048
+    }
+
+    return reservation; // RN-049, RN-051: returned as-is, not filtered by status
   }
 }

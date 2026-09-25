@@ -1,5 +1,11 @@
-import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import {
+  ApiNotFoundResponse,
+  ApiOkResponse,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 import { CheckAvailabilityDto } from './dto/check-availability.dto.js';
 import { ReservationsService } from './reservations.service.js';
@@ -37,5 +43,20 @@ export class ReservationsController {
   })
   checkAvailability(@Query() query: CheckAvailabilityDto) {
     return this.reservationsService.checkAvailability(query);
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'List every reservation' })
+  @ApiOkResponse({ description: 'List of reservations' })
+  findAll() {
+    return this.reservationsService.findAll();
+  }
+
+  @Get(':id')
+  @ApiOperation({ summary: 'Get one reservation' })
+  @ApiOkResponse({ description: 'The reservation' })
+  @ApiNotFoundResponse({ description: 'Reservation not found' })
+  findOne(@Param('id', ParseUUIDPipe) id: string) {
+    return this.reservationsService.findOne(id);
   }
 }

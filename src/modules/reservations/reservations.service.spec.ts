@@ -1,4 +1,4 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 
 import { ReservationsService, toStartsAt } from './reservations.service.js';
 
@@ -9,6 +9,7 @@ const buildService = (
 ) => {
   const reservationsRepo = {
     find: vi.fn().mockResolvedValue(overlapping),
+    findOne: vi.fn().mockResolvedValue(null),
   };
   const tablesRepo = {
     find: vi.fn().mockResolvedValue(freeTables),
@@ -92,5 +93,31 @@ describe('ReservationsService', () => {
 
     expect(result.available).toBe(true);
     expect(result.count).toBe(2);
+  });
+
+  it('lists reservations including their table (RN-050)', async () => {
+    const { service, reservationsRepo } = buildService();
+
+    await service.findAll();
+
+    expect(reservationsRepo.find.mock.calls[0][0].relations).toEqual({
+      table: true,
+    });
+  });
+
+  it('returns one reservation with its table', async () => {
+    const { service, reservationsRepo } = buildService();
+    const reservation = { id: 'r1', status: 'PENDING' };
+    reservationsRepo.findOne.mockResolvedValue(reservation);
+
+    await expect(service.findOne('r1')).resolves.toEqual(reservation);
+  });
+
+  it('throws when a reservation is not found (RN-048)', async () => {
+    const { service } = buildService();
+
+    await expect(service.findOne('missing')).rejects.toBeInstanceOf(
+      NotFoundException,
+    );
   });
 });
