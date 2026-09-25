@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -146,5 +147,30 @@ export class ReservationsService {
     }
 
     return reservation; // RN-049, RN-051: returned as-is, not filtered by status
+  }
+
+  // HU-010: RN-059 to RN-064.
+  async cancel(id: string): Promise<Reservation> {
+    const reservation = await this.findOne(id); // RN-059
+
+    if (reservation.status === ReservationStatus.CANCELLED) {
+      throw new ConflictException('Reservation is already cancelled'); // RN-060
+    }
+
+    if (
+      reservation.status === ReservationStatus.CHECKED_IN ||
+      reservation.status === ReservationStatus.COMPLETED
+    ) {
+      throw new ConflictException(
+        `Reservation with status ${reservation.status} cannot be cancelled`, // RN-061
+      );
+    }
+
+    // RN-062: the reservation is kept, only its status changes.
+    // RN-063: CANCELLED is not in BLOCKING_STATUSES, so the table is free again.
+    reservation.status = ReservationStatus.CANCELLED;
+    reservation.cancelledAt = new Date(); // RN-064
+
+    return this.reservationsRepository.save(reservation);
   }
 }
